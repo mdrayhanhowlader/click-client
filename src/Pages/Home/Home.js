@@ -6,7 +6,7 @@ import Timeline from "./Timeline";
 const Home = () => {
   return (
     <div>
-      <div className="md:grid md:grid-cols-4 gap-4">
+      <div className="md:grid md:grid-cols-4 gap-2">
         <div>
           <Profile></Profile>
         </div>
