@@ -1,24 +1,22 @@
-import React from "react";
+import React, { useContext } from "react";
 import { RiLiveFill } from "react-icons/ri";
 import { ImImages } from "react-icons/im";
 import { FaSmile } from "react-icons/fa";
 import { useForm } from "react-hook-form";
+import { AuthContext } from "../../contexts/AuthProvider";
 
 const PostTimeline = () => {
-  const { register, handleSubmit } = useForm();
+  const { user } = useContext(AuthContext);
+  const { register, handleSubmit, reset } = useForm();
   const imageHostKey = process.env.REACT_APP_imgbb_key;
 
   const postHandler = async (data) => {
-    // event.preventDefault();
-    // const form = event.target;
-    // const text = form.text.value;
-    // form.reset();
     const text = data.ptext;
-    // const image = data.image;
+
     console.log(text);
 
     // file send to imgBB
-    const image = data.image[0];
+    const image = data?.image[0];
     const formData = new FormData();
     formData.append("image", image);
     const url = `https://api.imgbb.com/1/upload?key=${imageHostKey}`;
@@ -28,8 +26,27 @@ const PostTimeline = () => {
       body: formData,
     });
     const img = await res.json();
-    const newImage = img.data.url;
+    const newImage = img?.data?.url;
     console.log(newImage);
+
+    const post = {
+      text,
+      img: newImage,
+      email: user.email,
+    };
+
+    reset();
+    fetch("http://localhost:5000/posts", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(post),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      });
   };
   return (
     <div>
