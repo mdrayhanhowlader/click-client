@@ -1,9 +1,12 @@
 import React from "react";
+import AboutCard from "./AboutCard";
+import AboutTimeline from "./AboutTimeline";
 
 const About = () => {
   return (
     <div>
-      <h2>This is about</h2>
+      <AboutCard></AboutCard>
+      <AboutTimeline></AboutTimeline>
     </div>
   );
 };

@@ -1,15 +1,15 @@
 import moment from "moment/moment";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { GrLike, GrDislike } from "react-icons/gr";
 import { AuthContext } from "./../../contexts/AuthProvider";
 import Comments from "./Comments";
-import { BiLike } from "react-icons/bi";
 
 const MediaCard = ({ post }) => {
-  const [like, setLike] = useState();
+  const [like, setLike] = useState(0);
   const { user } = useContext(AuthContext);
-  console.log(post);
+  // console.log(post);
   const time = moment().format("MM Do YYYY, h:mm:ss a");
-  console.log(time);
+  // console.log(time);
 
   const handleComment = (event) => {
     event.preventDefault();
@@ -33,7 +33,7 @@ const MediaCard = ({ post }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         form.reset();
       })
       .catch((error) => {
@@ -42,7 +42,37 @@ const MediaCard = ({ post }) => {
   };
 
   //   handle like
-  const handleLike = () => {};
+  const handleLike = () => {
+    setLike(like + 1);
+    const likeInfo = {
+      name: user.displayName,
+      image: user.photoURL,
+      email: user?.email,
+      postId: post._id,
+      like,
+    };
+
+    fetch(`http://localhost:5000/likes`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(likeInfo),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/likes/${post._id}`)
+      .then((res) => res.json())
+      .then((data) => setLike(data.length));
+  }, []);
   return (
     <div>
       <div className="rounded-md shadow-md w-4/5 bg-gray-50 text-gray-800 mx-auto">
@@ -64,7 +94,7 @@ const MediaCard = ({ post }) => {
           </div>
           <button title="Open options" type="button"></button>
         </div>
-        <p>{post.text}</p>
+        <p className="px-2">{post.text}</p>
         <div className={`${post.img ? "block" : "hidden"}`}>
           <img
             // src="https://source.unsplash.com/301x301/?random"
@@ -75,20 +105,23 @@ const MediaCard = ({ post }) => {
         </div>
         <div className="p-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 border-b pb-1">
               <button
                 onClick={() => handleLike(post._id)}
                 type="button"
                 title="Like post"
                 className="flex items-center justify-center"
               >
-                <BiLike className="text-3xl" />
+                <GrLike className="text-xl" />{" "}
+                <span className="ml-2">{like}</span>
               </button>
               <button
                 type="button"
                 title="Add a comment"
                 className="flex items-center justify-center"
-              ></button>
+              >
+                {/* <GrDislike className="text-3xl" /> <span>{like}</span> */}
+              </button>
               <button
                 type="button"
                 title="Share post"
@@ -136,10 +169,10 @@ const MediaCard = ({ post }) => {
             </div>
           </div>
           <div className="space-y-3">
-            <p className="text-sm">
+            {/* <p className="text-sm">
               <span className="text-base font-semibold">leroy_jenkins72</span>
               Nemo ea quasi debitis impedit!
-            </p>
+            </p> */}
             <form onSubmit={handleComment}>
               <input
                 type="text"
